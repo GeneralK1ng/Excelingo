@@ -1,7 +1,7 @@
 [project]
-name = "xlsx-translator"
+name = "excellingo"
 version = "0.1.0"
-description = "XLSX文件翻译工具"
+description = "ExcelLingo - 智能表格翻译工具"
 requires-python = ">=3.12"
 dependencies = [
     "openai>=1.0.0",

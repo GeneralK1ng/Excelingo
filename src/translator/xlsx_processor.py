@@ -19,38 +19,38 @@ class XlsxProcessor:
                         cells_data.append((cell, cell.value))
         return cells_data
     
-    async def translate_xlsx(self, file_path: str, target_lang: str, 
+    async def translate_xlsx(self, file_path: str, target_lang: str, max_concurrent: int = 50,
                            progress_callback=None, log_callback=None) -> str:
         if log_callback:
-            log_callback("开始加载文件...")
+            log_callback("Loading Excel file...")
         
         self.load_file(file_path)
         cells_data = self.get_all_text_cells()
         
         if not cells_data:
             if log_callback:
-                log_callback("文件中没有找到文本内容")
+                log_callback("No text content found in file")
             return file_path
             
         total_cells = len(cells_data)
         if log_callback:
-            log_callback(f"找到 {total_cells} 个文本单元格，开始翻译...")
+            log_callback(f"Found {total_cells} text cells, starting translation...")
             
         texts = [cell_data[1] for cell_data in cells_data]
         
         async with DeepSeekClient() as client:
             if log_callback:
-                log_callback("连接到DeepSeek API...")
+                log_callback("Connecting to DeepSeek API...")
             translated_texts = await client.batch_translate(
-                texts, target_lang, 
+                texts, target_lang, max_concurrent,
                 progress_callback=lambda i: (
                     progress_callback and progress_callback(i, total_cells),
-                    log_callback and log_callback(f"已翻译 {i}/{total_cells} 个单元格")
+                    log_callback and log_callback(f"Translated {i}/{total_cells} cells")
                 )
             )
             
         if log_callback:
-            log_callback("更新Excel文件...")
+            log_callback("Updating Excel file...")
             
         # 更新单元格
         for (cell, _), translated_text in zip(cells_data, translated_texts):
@@ -61,6 +61,6 @@ class XlsxProcessor:
         self.workbook.save(output_path)
         
         if log_callback:
-            log_callback(f"翻译完成！文件已保存: {output_path}")
+            log_callback(f"Translation completed! File saved: {output_path}")
             
         return output_path

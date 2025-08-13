@@ -24,7 +24,7 @@ class DeepSeekClient:
         if not text.strip():
             return text
             
-        prompt = f"请将以下文本翻译为{target_lang}，保持原有格式，只返回翻译结果：\n{text}"
+        prompt = f"Please translate the following text to {target_lang}, keep the original format, only return the translation result:\n{text}"
         
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -43,7 +43,7 @@ class DeepSeekClient:
             return result["choices"][0]["message"]["content"].strip()
     
     async def batch_translate(self, texts: List[str], target_lang: str, 
-                            max_concurrent: int = 80, progress_callback=None) -> List[str]:
+                            max_concurrent: int = 50, progress_callback=None) -> List[str]:
         semaphore = asyncio.Semaphore(max_concurrent)
         completed = 0
         
